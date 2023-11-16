@@ -1,5 +1,11 @@
 # Jikken5
 
 attentions.py はコピペした。encoderとdecoder、MultiHeadAttention、FFN クラスがある。
-train.py は参考に自分たちで書く必要あり
+
+train.py は参考に自分たちで書く必要あり\\
+
 commons.py　はコピペした。ニューラルネットワークの初期化、パディング、シーケンス生成、およびその他の関連ユーティリティ関数がある。
+
+inference.ipymb はよくわかんないけど一応ファイルだけ作った。多分自分たちで作る必要あり
+
+losses.py　はコピペした。生成モデル（Generator）および識別モデル（Discriminator）の損失関数を計算するための関数がある。
