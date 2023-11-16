@@ -12,4 +12,4 @@ losses.py　はコピペした。生成モデル（Generator）および識別�
 
 mel_processing.pyは人によってコードが違うから考える必要あり。
 
-models.py 音声合成モデル（SynthesizerTrn）を実装している
+models.py 音声合成モデル（SynthesizerTrn）を実装している。コピペしちゃったけど編集する必要あり。
