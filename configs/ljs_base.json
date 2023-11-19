@@ -17,8 +17,8 @@
     "c_kl": 1.0
   },
   "data": {
-    "training_files": "filelists/ljs_audio_test_filelist.txt.cleaned",
-    "validation_files": "filelists/ljs_audio_val_filelist.txt.cleaned",
+    "training_files": "filelists/ljs_audio_test_filelist.txt",
+    "validation_files": "filelists/ljs_audio_val_filelist.txt",
     "text_cleaners": ["english_cleaners2"],
     "bits_per_sample": 16,
     "sampling_rate": 22050,
