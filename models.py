@@ -303,9 +303,8 @@ class SynthesizerTrn(nn.Module):
     self.flow = ResidualCouplingBlock(inter_channels, hidden_channels, 5, 1, 4, gin_channels=gin_channels)
 
 
-  def forward(self, x, x_lengths, y, y_lengths, sid=None, text=None):
+  def forward(self, x,  y, y_lengths, sid=None):
 
-    x, m_p, logs_p, x_mask = self.enc_p(x, x_lengths)
     if self.n_speakers > 0:
       g = self.emb_g(sid).unsqueeze(-1) # [b, h, 1]
     else:
@@ -314,8 +313,8 @@ class SynthesizerTrn(nn.Module):
     z, m_q, logs_q, y_mask = self.enc_q(y, y_lengths, g=g)
     # z_p = self.flow(z, y_mask, g=g)
 
-    if text is not None:
-        text_embedding = self.prompt_encoder(text)  # テキストはバッチ内の各項目のリスト
+    if x is not None:
+        text_embedding = self.prompt_encoder(x)  # テキストはバッチ内の各項目のリスト
         text_embedding = text_embedding.unsqueeze(-1).expand(-1, -1, z.size(2))  # 適切な形状に展開
         z = z + text_embedding
 
@@ -346,7 +345,7 @@ class SynthesizerTrn(nn.Module):
 
     z_slice, ids_slice = commons.rand_slice_segments(z, y_lengths, self.segment_size)
     o = self.dec(z_slice, g=g)
-    return o, ids_slice, x_mask, y_mask, (z, m_p, logs_p, m_q, logs_q)
+    return o, ids_slice, y_mask, (z, m_q, logs_q)
 
   def infer(self, x, x_lengths, sid=None, noise_scale=1, length_scale=1, noise_scale_w=1., max_len=None):
     x, m_p, logs_p, x_mask = self.enc_p(x, x_lengths)
