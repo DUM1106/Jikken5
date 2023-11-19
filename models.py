@@ -8,7 +8,7 @@ import commons
 import modules
 import attentions
 import monotonic_align
-
+from sentence_transformers import SentenceTransformer
 from torch.nn import Conv1d, ConvTranspose1d, AvgPool1d, Conv2d
 from torch.nn.utils import weight_norm, remove_weight_norm, spectral_norm
 from commons import init_weights, get_padding
@@ -175,6 +175,27 @@ class TextEncoder(nn.Module):
     m, logs = torch.split(stats, self.out_channels, dim=1)
     return x, m, logs, x_mask
 
+
+class PromptEncoder(nn.Module):
+    def __init__(self, hidden_dim, output_dim):
+        super().__init__()
+        # Load the pre-trained Sentence-BERT model
+        self.bert = SentenceTransformer("stsb-xlm-r-multilingual")
+        # Define three fully connected layers
+        self.fc1 = nn.Linear(self.bert.get_sentence_embedding_dimension(), hidden_dim)
+        self.fc2 = nn.Linear(hidden_dim, hidden_dim)
+        self.fc3 = nn.Linear(hidden_dim, output_dim)
+        self.activation = nn.ReLU()
+
+    def forward(self, text):
+        # Get the embeddings from the pre-trained BERT model
+        with torch.no_grad():  # We don't need gradients for the pre-trained model
+            embeddings = self.bert.encode(text, convert_to_tensor=True)
+        # Pass the embeddings through the fully connected layers with ReLU activation in between
+        x = self.activation(self.fc1(embeddings))
+        x = self.activation(self.fc2(x))
+        x = self.fc3(x)
+        return x
 
 class ResidualCouplingBlock(nn.Module):
   def __init__(self,
@@ -412,6 +433,8 @@ class SynthesizerTrn(nn.Module):
     n_speakers=0,
     gin_channels=0,
     use_sdp=True,
+    prompt_encoder_hidden_dim=None,  # Set default to None
+    prompt_encoder_output_dim=None,  # PromptEncoderの出力層の次元
     **kwargs):
 
     super().__init__()
@@ -433,6 +456,7 @@ class SynthesizerTrn(nn.Module):
     self.segment_size = segment_size
     self.n_speakers = n_speakers
     self.gin_channels = gin_channels
+    self.prompt_encoder = PromptEncoder(prompt_encoder_hidden_dim, prompt_encoder_output_dim)
 
     self.use_sdp = use_sdp
 
@@ -456,7 +480,7 @@ class SynthesizerTrn(nn.Module):
     if n_speakers > 1:
       self.emb_g = nn.Embedding(n_speakers, gin_channels)
 
-  def forward(self, x, x_lengths, y, y_lengths, sid=None):
+  def forward(self, x, x_lengths, y, y_lengths, sid=None, text=None):
 
     x, m_p, logs_p, x_mask = self.enc_p(x, x_lengths)
     if self.n_speakers > 0:
@@ -466,6 +490,11 @@ class SynthesizerTrn(nn.Module):
 
     z, m_q, logs_q, y_mask = self.enc_q(y, y_lengths, g=g)
     z_p = self.flow(z, y_mask, g=g)
+
+    if text is not None:
+        text_embedding = self.prompt_encoder(text)  # テキストはバッチ内の各項目のリスト
+        text_embedding = text_embedding.unsqueeze(-1).expand(-1, -1, z.size(2))  # 適切な形状に展開
+        z = z + text_embedding
 
     with torch.no_grad():
       # negative cross-entropy
