@@ -23,3 +23,5 @@ train_ms.py とtrain.pyの違いよくわからなかった。両方とも空白
 transform.pyはコピペした。PyTorchを使用して確率的な逆変換を実行するためのコード？どこで使われているかはまだ確認していない。
 
 configにtraining_filesとかはいってるからそれを編集する必要あり
+
+utils data_utils はコピペ
