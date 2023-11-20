@@ -24,7 +24,7 @@ class PromptEncoder(nn.Module):
         # Get the last layer's output dimension
         last_layer_dim = self.bert[1].word_embedding_dimension
         print("**************************************************************************************************")
-        print(last_layer_dim)
+        print(last_layer_dim, hidden_dim)
         print("**************************************************************************************************")
         # Use the last layer's output dimension in nn.Linear
         self.fc1 = nn.Linear(last_layer_dim, hidden_dim)
