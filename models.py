@@ -278,8 +278,6 @@ class SynthesizerTrn(nn.Module):
     n_speakers=0,
     gin_channels=0,
     use_sdp=True,
-    prompt_encoder_hidden_dim=None,  # Set default to None
-    prompt_encoder_output_dim=None,  # PromptEncoderの出力層の次元
     **kwargs):
 
     super().__init__()
@@ -301,7 +299,7 @@ class SynthesizerTrn(nn.Module):
     self.segment_size = segment_size
     self.n_speakers = n_speakers
     self.gin_channels = gin_channels
-    self.prompt_encoder = PromptEncoder(prompt_encoder_hidden_dim, prompt_encoder_output_dim)
+    self.prompt_encoder = PromptEncoder(256, self.hidden_dim)
 
     self.use_sdp = use_sdp
 
