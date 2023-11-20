@@ -20,10 +20,14 @@ class PromptEncoder(nn.Module):
         # Load the pre-trained Sentence-BERT model
         self.bert = SentenceTransformer("stsb-xlm-r-multilingual")
         # Define three fully connected layers
+        #self.fc1 = nn.Linear(self.bert.get_sentence_embedding_dimension(), hidden_dim)
+        # Get the last layer's output dimension
+        last_layer_dim = self.bert[1].word_embedding_dimension
         print("**************************************************************************************************")
-        print(self.bert.get_sentence_embedding_dimension)
+        print(last_layer_dim)
         print("**************************************************************************************************")
-        self.fc1 = nn.Linear(self.bert.get_sentence_embedding_dimension(), hidden_dim)
+        # Use the last layer's output dimension in nn.Linear
+        self.fc1 = nn.Linear(last_layer_dim, hidden_dim)
         self.fc2 = nn.Linear(hidden_dim, hidden_dim)
         self.fc3 = nn.Linear(hidden_dim, output_dim)
         self.activation = nn.ReLU()
