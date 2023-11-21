@@ -129,7 +129,6 @@ def run(rank, n_gpus, hps):
 
 
 def train_and_evaluate(rank, epoch, hps, nets, optims, schedulers, scaler, loaders, logger, writers):
-  print("ううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううう")
   net_g, net_d = nets
   optim_g, optim_d = optims
   scheduler_g, scheduler_d = schedulers
@@ -143,6 +142,7 @@ def train_and_evaluate(rank, epoch, hps, nets, optims, schedulers, scaler, loade
   net_g.train()
   net_d.train()
   for batch_idx, (x, x_lengths, spec, spec_lengths, y, y_lengths) in enumerate(train_loader):
+    print("ううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううう")
     x, x_lengths = x.cuda(rank, non_blocking=True), x_lengths.cuda(rank, non_blocking=True)
     spec, spec_lengths = spec.cuda(rank, non_blocking=True), spec_lengths.cuda(rank, non_blocking=True)
     y, y_lengths = y.cuda(rank, non_blocking=True), y_lengths.cuda(rank, non_blocking=True)
