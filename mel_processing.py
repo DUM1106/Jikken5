@@ -49,9 +49,7 @@ hann_window = {}
 
 
 def spectrogram_torch(y, n_fft, sampling_rate, hop_size, win_size, center=False):
-    # 最小値と最大値をチェック
-    print('min value: ', torch.min(y))
-    print('max value: ', torch.max(y))
+
 
     global hann_window
     dtype_device = str(y.dtype) + '_' + str(y.device)
@@ -59,30 +57,21 @@ def spectrogram_torch(y, n_fft, sampling_rate, hop_size, win_size, center=False)
     # ハン窓が既に存在するかチェックし、存在しない場合は作成
     if wnsize_dtype_device not in hann_window:
         hann_window[wnsize_dtype_device] = torch.hann_window(win_size).to(dtype=y.dtype, device=y.device)
-        print(f'ハン窓を作成しました: {wnsize_dtype_device}')
 
-    # パディングを適用前の波形の形状を出力
-    print('パディング適用前の波形の形状:', y.shape)
 
     # パディングを適用
     y = torch.nn.functional.pad(y.unsqueeze(1), (int((n_fft-hop_size)/2), int((n_fft-hop_size)/2)), mode='reflect')
     y = y.squeeze(1)
 
-    # パディング適用後の波形の形状を出力
-    print('パディング適用後の波形の形状:', y.shape)
+
 
     # STFTを計算
     spec = torch.stft(y, n_fft, hop_length=hop_size, win_length=win_size, window=hann_window[wnsize_dtype_device],
                       center=center, pad_mode='reflect', normalized=False, onesided=True ,return_complex=True)
 
-    # スペクトログラムの形状を出力
-    print('複素スペクトログラムの形状:', spec.shape)
-
     # スペクトログラムの大きさを計算
     spec = torch.sqrt(spec.pow(2).sum(-3) + 1e-6)
 
-    # 最終的なスペクトログラムの形状を出力
-    print('最終的なスペクトログラムの形状:', spec.shape)
     return spec
 
 

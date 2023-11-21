@@ -131,7 +131,9 @@ class TextAudioCollate():
         wav_lengths = torch.LongTensor(len(batch))
 
         text_padded = torch.LongTensor(len(batch), max_text_len)
-        spec_padded = torch.FloatTensor(len(batch), batch[0][1].size(0), max_spec_len)
+        max_time_frames = max([x[1].size(0) for x in batch])  # 時間フレームの最大長を取得
+        spec_padded = torch.FloatTensor(len(batch), max_time_frames, batch[0][1].size(1)).zero_()  # 形状を修正
+
         wav_padded = torch.FloatTensor(len(batch), 1, max_wav_len)
         text_padded.zero_()
         spec_padded.zero_()
@@ -144,8 +146,9 @@ class TextAudioCollate():
             text_lengths[i] = text.size(0)
 
             spec = row[1]
-            spec_padded[i, :, :spec.size(1)] = spec
-            spec_lengths[i] = spec.size(1)
+            # スペクトログラムを正しい次元でパディング
+            spec_padded[i, :spec.size(0), :] = spec  # spec.size(0) は時間フレームの長さ
+            spec_lengths[i] = spec.size(0)
 
             wav = row[2]
             wav_padded[i, :, :wav.size(1)] = wav
