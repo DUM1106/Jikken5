@@ -142,7 +142,7 @@ def train_and_evaluate(rank, epoch, hps, nets, optims, schedulers, scaler, loade
   net_g.train()
   net_d.train()
   print("ううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううう")
-  print(enumerate(train_loader))
+  print(train_loader)
   print("ううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううう")
   for batch_idx, (x, x_lengths, spec, spec_lengths, y, y_lengths) in enumerate(train_loader):
     x, x_lengths = x.cuda(rank, non_blocking=True), x_lengths.cuda(rank, non_blocking=True)
