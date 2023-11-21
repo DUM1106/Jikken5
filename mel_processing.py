@@ -67,6 +67,7 @@ def spectrogram_torch(y, n_fft, sampling_rate, hop_size, win_size, center=False)
                       center=center, pad_mode='reflect', normalized=False, onesided=True ,return_complex=True)
 
     spec = torch.sqrt(spec.pow(2).sum(-1) + 1e-6)
+    print("スペクトログラムの形状:", spec.shape)
     return spec
 
 
