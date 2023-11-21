@@ -72,11 +72,16 @@ class TextAudioLoader(torch.utils.data.Dataset):
         spec_filename = filename.replace(".wav", ".spec.pt")
         if os.path.exists(spec_filename):
             spec = torch.load(spec_filename)
+            # スペクトログラムの次元が2ではない場合は再計算
+            if spec.dim() != 2:
+                spec = spectrogram_torch(audio_norm, self.filter_length,
+                                         self.sampling_rate, self.hop_length, self.win_length,
+                                         center=False)
+                torch.save(spec, spec_filename)
         else:
             spec = spectrogram_torch(audio_norm, self.filter_length,
-                self.sampling_rate, self.hop_length, self.win_length,
-                center=False)
-            spec = torch.squeeze(spec, 0)
+                                     self.sampling_rate, self.hop_length, self.win_length,
+                                     center=False)
             torch.save(spec, spec_filename)
         return spec, audio_norm
 
