@@ -64,7 +64,11 @@ class TextAudioLoader(torch.utils.data.Dataset):
 
     def get_audio(self, filename):
         audio, sampling_rate = load_wav_to_torch(filename)
-        print(f"オーディオ長さ: {audio.shape[1]} サンプル, サンプリングレート: {sampling_rate}")
+        print(f"オーディオ次元数: {audio.dim()}, オーディオ形状: {audio.shape}")
+        if sampling_rate != self.sampling_rate:
+            raise ValueError(
+                f"{filename} のサンプリングレートが {sampling_rate} で、期待されるサンプリングレート {self.sampling_rate} と一致しません。")
+        # 続きのコード...
         if sampling_rate != self.sampling_rate:
             raise ValueError("{} {} SR doesn't match target {} SR".format(
                 sampling_rate, self.sampling_rate))
