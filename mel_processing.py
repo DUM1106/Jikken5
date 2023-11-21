@@ -72,6 +72,8 @@ def spectrogram_torch(y, n_fft, sampling_rate, hop_size, win_size, center=False)
     # スペクトログラムの大きさを計算
     spec = torch.sqrt(spec.pow(2).sum(-3) + 1e-6)
 
+    # 最終的なスペクトログラムの形状を出力
+    print('最終的なスペクトログラムの形状:', spec.shape)
     return spec
 
 
