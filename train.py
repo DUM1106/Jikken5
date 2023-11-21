@@ -71,6 +71,9 @@ def run(rank, n_gpus, hps):
   torch.cuda.set_device(rank)
 
   train_dataset = TextAudioLoader(hps.data.training_files, hps.data)
+  print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+  print(len(train_dataset))
+  print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
   train_sampler = DistributedBucketSampler(
       train_dataset,
       hps.train.batch_size,
@@ -141,8 +144,10 @@ def train_and_evaluate(rank, epoch, hps, nets, optims, schedulers, scaler, loade
 
   net_g.train()
   net_d.train()
+  print("ううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううう")
+  print(train_loader)
+  print("ううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううう")
   for batch_idx, (x, x_lengths, spec, spec_lengths, y, y_lengths) in enumerate(train_loader):
-    return
     x, x_lengths = x.cuda(rank, non_blocking=True), x_lengths.cuda(rank, non_blocking=True)
     spec, spec_lengths = spec.cuda(rank, non_blocking=True), spec_lengths.cuda(rank, non_blocking=True)
     y, y_lengths = y.cuda(rank, non_blocking=True), y_lengths.cuda(rank, non_blocking=True)
