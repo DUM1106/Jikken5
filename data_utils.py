@@ -81,14 +81,15 @@ class TextAudioLoader(torch.utils.data.Dataset):
         return spec, audio_norm
 
     def get_text(self, text):
-        #if self.cleaned_text:
+        """#if self.cleaned_text:
         #    text_norm = cleaned_text_to_sequence(text)
         #else:
         #    text_norm = text_to_sequence(text, self.text_cleaners)
         if self.add_blank:
             text_norm = commons.intersperse(text_norm, 0)
         text_norm = torch.LongTensor(text_norm)
-        return text_norm
+        return text_norm"""
+        return text
 
     def __getitem__(self, index):
         return self.get_audio_text_pair(self.audiopaths_and_text[index])
