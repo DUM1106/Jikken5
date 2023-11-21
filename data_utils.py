@@ -111,6 +111,14 @@ class TextAudioCollate():
         batch: [text_normalized, spec_normalized, wav_normalized]
         """
         # Right zero-pad all one-hot text sequences to max input length
+        print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        print("Batch before processing:")
+        for i, data in enumerate(batch):
+            print(f"Item {i}:")
+            text, spec, wav = data
+            print(f"  Text: {text}")
+            print(f"  Spectrogram shape: {spec.size()}")
+            print(f"  Waveform shape: {wav.size()}")
         _, ids_sorted_decreasing = torch.sort(
             torch.LongTensor([x[1].size(1) for x in batch]),
             dim=0, descending=True)
