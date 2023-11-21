@@ -83,7 +83,8 @@ def run(rank, n_gpus, hps):
   train_loader = DataLoader(train_dataset, num_workers=8, shuffle=False, pin_memory=True,
       collate_fn=collate_fn, batch_sampler=train_sampler)
   print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-  print(len(train_loader[0]),len(train_loader[1]),len(train_loader[2]),len(train_loader[3]),len(train_loader[4]),len(train_loader[5]),len(train_loader[6]))
+  for i, batch in enumerate(train_loader):
+      print(f"Batch {i} contains {len(batch)} samples.")
   print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
   if rank == 0:
     eval_dataset = TextAudioLoader(hps.data.validation_files, hps.data)
