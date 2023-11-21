@@ -207,9 +207,7 @@ def train_and_evaluate(rank, epoch, hps, nets, optims, schedulers, scaler, loade
     grad_norm_g = commons.clip_grad_value_(net_g.parameters(), None)
     scaler.step(optim_g)
     scaler.update()
-    print("あああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ")
-    print(global_step % hps.train.log_interval)
-    print("あああああああああああああああああああああああああああああああああああああああああああああああああああああああああああああ")
+
     if rank==0:
       if global_step % hps.train.log_interval == 0:
         lr = optim_g.param_groups[0]['lr']
