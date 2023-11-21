@@ -83,8 +83,10 @@ def run(rank, n_gpus, hps):
   train_loader = DataLoader(train_dataset, num_workers=8, shuffle=False, pin_memory=True,
       collate_fn=collate_fn, batch_sampler=train_sampler)
   print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-  for i, batch in enumerate(train_loader):
-      print(f"Batch {i} contains {len(batch)} samples.")
+  # DistributedBucketSamplerインスタンスに対して
+  empty_buckets = [i for i, bucket in enumerate(train_sampler.buckets) if not bucket]
+  print("空のバケツのインデックス:", empty_buckets)
+
   print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
   if rank == 0:
     eval_dataset = TextAudioLoader(hps.data.validation_files, hps.data)
