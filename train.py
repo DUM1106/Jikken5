@@ -129,6 +129,7 @@ def run(rank, n_gpus, hps):
 
 
 def train_and_evaluate(rank, epoch, hps, nets, optims, schedulers, scaler, loaders, logger, writers):
+  print("ううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううううう")
   net_g, net_d = nets
   optim_g, optim_d = optims
   scheduler_g, scheduler_d = schedulers
