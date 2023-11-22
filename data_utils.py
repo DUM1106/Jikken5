@@ -4,7 +4,7 @@ import random
 import numpy as np
 import torch
 import torch.utils.data
-
+import torch.nn.functional as F
 import commons 
 from mel_processing import spectrogram_torch
 from utils import load_wav_to_torch, load_filepaths_and_text
@@ -14,7 +14,7 @@ from utils import load_wav_to_torch, load_filepaths_and_text
 class TextAudioLoader(torch.utils.data.Dataset):
     """
         1) loads audio, text pairs
-        2) normalizes text and converts them to sequences of integers
+
         3) computes spectrograms from audio files.
     """
     def __init__(self, audiopaths_and_text, hparams):
@@ -78,11 +78,11 @@ class TextAudioLoader(torch.utils.data.Dataset):
                                          self.sampling_rate, self.hop_length, self.win_length,
                                          center=False)
                 torch.save(spec, spec_filename)
-        else:
-            spec = spectrogram_torch(audio_norm, self.filter_length,
+
+        spec = spectrogram_torch(audio_norm, self.filter_length,
                                      self.sampling_rate, self.hop_length, self.win_length,
                                      center=False)
-            torch.save(spec, spec_filename)
+        torch.save(spec, spec_filename)
         return spec, audio_norm
 
     def get_text(self, text):
@@ -116,52 +116,44 @@ class TextAudioCollate():
         batch: [text_normalized, spec_normalized, wav_normalized]
         """
         # Right zero-pad all one-hot text sequences to max input length
-        print("Batch before processing:")
         for i, data in enumerate(batch):
-            print(f"Item {i}:")
             text, spec, wav = data
-            print(f"  Text: {text}")
-            print(f"  Spectrogram shape: {spec.size()}")
-            print(f"  Waveform shape: {wav.size()}")
         _, ids_sorted_decreasing = torch.sort(
             torch.LongTensor([x[1].size(1) for x in batch]),
             dim=0, descending=True)
 
-        max_text_len = max([len(x[0]) for x in batch])
+        texts = [x[0] for x in batch]
         max_spec_len = max([x[1].size(1) for x in batch])
         max_wav_len = max([x[2].size(1) for x in batch])
 
-        text_lengths = torch.LongTensor(len(batch))
-        spec_lengths = torch.LongTensor(len(batch))
-        wav_lengths = torch.LongTensor(len(batch))
+        text_lengths = torch.LongTensor([len(x[0]) for x in batch])
+        spec_lengths = torch.LongTensor([max_spec_len for _ in batch])
+        wav_lengths = torch.LongTensor([max_wav_len for _ in batch])
 
-        text_padded = torch.LongTensor(len(batch), max_text_len)
         max_time_frames = max([x[1].size(0) for x in batch])  # 時間フレームの最大長を取得
-        spec_padded = torch.FloatTensor(len(batch), max_time_frames, batch[0][1].size(1)).zero_()  # 形状を修正
+        spec_padded = torch.FloatTensor(len(batch), max_time_frames, max_spec_len)
 
         wav_padded = torch.FloatTensor(len(batch), 1, max_wav_len)
-        text_padded.zero_()
+
         spec_padded.zero_()
         wav_padded.zero_()
         for i in range(len(ids_sorted_decreasing)):
             row = batch[ids_sorted_decreasing[i]]
 
-            text = row[0]
-            text_padded[i, :text.size(0)] = text
-            text_lengths[i] = text.size(0)
-
             spec = row[1]
+            if spec.size(1) < max_spec_len:
+                # Calculate how much padding is needed
+                padding_needed = max_spec_len - spec.size(1)
+                # Pad the spec tensor. F.pad uses (padding_left, padding_right, padding_top, padding_bottom)
+                spec = F.pad(spec, (0, padding_needed), 'constant', 0)
             # スペクトログラムを正しい次元でパディング
-            spec_padded[i, :spec.size(0), :] = spec  # spec.size(0) は時間フレームの長さ
-            spec_lengths[i] = spec.size(0)
-
+            spec_padded[i, :spec.size(0), :] = spec  # spec.size(0) は時間フレームの長
             wav = row[2]
             wav_padded[i, :, :wav.size(1)] = wav
-            wav_lengths[i] = wav.size(1)
 
         if self.return_ids:
-            return text_padded, text_lengths, spec_padded, spec_lengths, wav_padded, wav_lengths, ids_sorted_decreasing
-        return text_padded, text_lengths, spec_padded, spec_lengths, wav_padded, wav_lengths
+            return texts, text_lengths, spec_padded, spec_lengths, wav_padded, wav_lengths, ids_sorted_decreasing
+        return texts, text_lengths, spec_padded, spec_lengths, wav_padded, wav_lengths
 
 
 """Multi speaker version"""

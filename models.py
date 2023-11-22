@@ -19,22 +19,19 @@ class PromptEncoder(nn.Module):
         super().__init__()
         # Load the pre-trained Sentence-BERT model
         self.bert = SentenceTransformer("stsb-xlm-r-multilingual")
-        # Define three fully connected layers
-        #self.fc1 = nn.Linear(self.bert.get_sentence_embedding_dimension(), hidden_dim)
-        # Get the last layer's output dimension
-        last_layer_dim = self.bert[1].word_embedding_dimension
-        #print("**************************************************************************************************")
-        #print(last_layer_dim)
-        #print("**************************************************************************************************")
-        # Use the last layer's output dimension in nn.Linear
-        self.fc1 = nn.Linear(last_layer_dim, hidden_dim)
+        # Get the embedding dimension
+        embedding_dim = self.bert.get_sentence_embedding_dimension()
+        # Define fully connected layers
+        self.fc1 = nn.Linear(embedding_dim, hidden_dim)
         self.fc2 = nn.Linear(hidden_dim, hidden_dim)
         self.fc3 = nn.Linear(hidden_dim, output_dim)
         self.activation = nn.ReLU()
 
     def forward(self, text):
+        # Check if input text is a list of strings
+
         # Get the embeddings from the pre-trained BERT model
-        with torch.no_grad():  # We don't need gradients for the pre-trained model
+        with torch.no_grad():
             embeddings = self.bert.encode(text, convert_to_tensor=True)
         # Pass the embeddings through the fully connected layers with ReLU activation in between
         x = self.activation(self.fc1(embeddings))
@@ -305,7 +302,7 @@ class SynthesizerTrn(nn.Module):
 
     self.dec = Generator(inter_channels, resblock, resblock_kernel_sizes, resblock_dilation_sizes, upsample_rates, upsample_initial_channel, upsample_kernel_sizes, gin_channels=gin_channels)
     self.enc_q = PosteriorEncoder(spec_channels, inter_channels, hidden_channels, 5, 1, 16, gin_channels=gin_channels)
-    self.flow = ResidualCouplingBlock(inter_channels, hidden_channels, 5, 1, 4, gin_channels=gin_channels)
+    #self.flow = ResidualCouplingBlock(inter_channels, hidden_channels, 5, 1, 4, gin_channels=gin_channels)
 
 
   def forward(self, x,  y, y_lengths, sid=None):
@@ -317,11 +314,34 @@ class SynthesizerTrn(nn.Module):
 
     z, m_q, logs_q, y_mask = self.enc_q(y, y_lengths, g=g)
     # z_p = self.flow(z, y_mask, g=g)
-
+    print(f"y shape:{y.size()}")
     if x is not None:
-        text_embedding = self.prompt_encoder(x)  # テキストはバッチ内の各項目のリスト
-        text_embedding = text_embedding.unsqueeze(-1).expand(-1, -1, z.size(2))  # 適切な形状に展開
+        if isinstance(x, str):
+            # If x is a single string, wrap it in a list
+            x = [x]
+        elif isinstance(x, list) and all(isinstance(elem, str) for elem in x):
+            # If x is already a list of strings, we do not need to do anything
+            pass
+        else:
+            # If x is neither a string nor a list of strings, raise an error
+            raise TypeError("The input to the PromptEncoder must be a list of strings.")
+        text_embedding = self.prompt_encoder(x)  # Get text embeddings
+
+        # Ensure text_embedding has three dimensions: [batch_size, embedding_size, 1]
+        if text_embedding.dim() == 2:
+            text_embedding = text_embedding.unsqueeze(-1)
+
+        # Verify the shape before expansion
+        if text_embedding.size(1) != z.size(1):
+            raise ValueError(f'Embedding size mismatch! text_embedding: {text_embedding.size(1)}, z: {z.size(1)}')
+
+        # Expand text_embedding to match the size of z in the last dimension
+        text_embedding = text_embedding.expand(-1, -1, z.size(2))
+
+        # Add the expanded text embedding to z
         z = z + text_embedding
+
+
 
     # with torch.no_grad():
       # negative cross-entropy
@@ -347,7 +367,6 @@ class SynthesizerTrn(nn.Module):
     # # expand prior
     # m_p = torch.matmul(attn.squeeze(1), m_p.transpose(1, 2)).transpose(1, 2)
     # logs_p = torch.matmul(attn.squeeze(1), logs_p.transpose(1, 2)).transpose(1, 2)
-
     z_slice, ids_slice = commons.rand_slice_segments(z, y_lengths, self.segment_size)
     o = self.dec(z_slice, g=g)
     return o, ids_slice, y_mask, (z, m_q, logs_q)
@@ -364,8 +383,29 @@ class SynthesizerTrn(nn.Module):
 
       # テキスト入力がある場合、プロンプトエンコーダーで埋め込みを取得し、潜在空間表現に追加
       if x is not None:
-          text_embedding = self.prompt_encoder(x)
-          text_embedding = text_embedding.unsqueeze(-1).expand(-1, -1, z.size(2))
+          if isinstance(x, str):
+              # If x is a single string, wrap it in a list
+              x = [x]
+          elif isinstance(x, list) and all(isinstance(elem, str) for elem in x):
+              # If x is already a list of strings, we do not need to do anything
+              pass
+          else:
+              # If x is neither a string nor a list of strings, raise an error
+              raise TypeError("The input to the PromptEncoder must be a list of strings.")
+          text_embedding = self.prompt_encoder(x)  # Get text embeddings
+
+          # Ensure text_embedding has three dimensions: [batch_size, embedding_size, 1]
+          if text_embedding.dim() == 2:
+              text_embedding = text_embedding.unsqueeze(-1)
+
+          # Verify the shape before expansion
+          if text_embedding.size(1) != z.size(1):
+              raise ValueError(f'Embedding size mismatch! text_embedding: {text_embedding.size(1)}, z: {z.size(1)}')
+
+          # Expand text_embedding to match the size of z in the last dimension
+          text_embedding = text_embedding.expand(-1, -1, z.size(2))
+
+          # Add the expanded text embedding to z
           z = z + text_embedding
 
       o = self.dec(z, g=g)
