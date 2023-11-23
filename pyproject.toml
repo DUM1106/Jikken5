@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "jikken5"
+version = "0.1.0"
+description = ""
+authors = ["Nishiken <ticaltlcopan@protonmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+jupyter = "^1.0.0"
+torch = {version = "^2.1.1", extras = ["cuda118"]}
+tensorboard = "^2.15.1"
+scipy = "^1.11.4"
+librosa = "^0.10.1"
+sentence-transformers = "^2.2.2"
+requests = "^2.31.0"
+charset-normalizer = "^3.3.2"
+chardet = "^5.2.0"
+matplotlib = "^3.8.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
