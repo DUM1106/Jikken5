@@ -1,6 +1,6 @@
 jvs_ver1/jvs001/parallel100/wav24kHz16bit/VOICEACTRESS100_001.wav|男性の声は普通で、話すスピードは遅く、音の高さが高いです。Adult（大人の男性）のような太い声で、かっこいい印象があります。
-jvs_ver1/jvs001/parallel100/wav24kHz16bit/VOICEACTRESS100_002.wav|男性の声は普通で、話すスピードは遅く、音の高さが高いです。Adult（大人の男性）のような太い声で、かっこいい印象があります。
-jvs_ver1/jvs001/parallel100/wav24kHz16bit/VOICEACTRESS100_003.wav|男性の声は普通で、話すスピードは遅く、音の高さが高いです。Adult（大人の男性）のような太い声で、かっこいい印象があります。
+jvs_ver1/jvs001/parallel100/wav24kHz16bit/VOICEACTRESS100_002.wav|男性の声は普通ではなく、話すスピードは遅く、音の高さが高いです。Adult（大人の男性）のような太い声で、かっこいい印象があります。
+jvs_ver1/jvs001/parallel100/wav24kHz16bit/VOICEACTRESS100_003.wav|男性の声は普通であり、話すスピードは遅く、音の高さが高いです。Adult（大人の男性）のような太い声で、かっこいい印象があります。
 jvs_ver1/jvs001/parallel100/wav24kHz16bit/VOICEACTRESS100_004.wav|男性の声は普通で、話すスピードは遅く、音の高さが高いです。Adult（大人の男性）のような太い声で、かっこいい印象があります。
 jvs_ver1/jvs001/parallel100/wav24kHz16bit/VOICEACTRESS100_005.wav|男性の声は普通で、話すスピードは遅く、音の高さが高いです。Adult（大人の男性）のような太い声で、かっこいい印象があります。
 jvs_ver1/jvs001/parallel100/wav24kHz16bit/VOICEACTRESS100_006.wav|男性の声は普通で、話すスピードは遅く、音の高さが高いです。Adult（大人の男性）のような太い声で、かっこいい印象があります。
