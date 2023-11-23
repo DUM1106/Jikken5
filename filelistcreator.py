@@ -1,6 +1,6 @@
-file_list_path = "filelists/ljs_audio_val_filelist.txt"
-speaker_id = "jvs100"
-voice_description = "この男性は普通の高さで、普通の速さで話します。大人の雰囲気があり、かっこいい雰囲気を持ちつつ、流暢で爽やかで明瞭な発音があります。"
+file_list_path = "filelists/ljs_audio_test_filelist.txt"
+speaker_id = "jvs070"
+voice_description = "この男性は高い声で、速い速さで話します。大人の雰囲気があり、太い声で明るく、かっこいい雰囲気と渋さが漂います。流暢で爽やかで明瞭な発音があります。"
 
 with open(file_list_path, 'a') as file:
     for i in range(1, 101):
