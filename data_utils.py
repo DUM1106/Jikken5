@@ -65,24 +65,28 @@ class TextAudioLoader(torch.utils.data.Dataset):
     def get_audio(self, filename):
         audio, sampling_rate = load_wav_to_torch(filename)
         if sampling_rate != self.sampling_rate:
-            raise ValueError("{} {} SR doesn't match target {} SR".format(
-                sampling_rate, self.sampling_rate))
+            raise ValueError(f"{filename}: {sampling_rate} SR doesn't match target {self.sampling_rate} SR")
+
         audio_norm = audio / self.max_wav_value
         audio_norm = audio_norm.unsqueeze(0)
         spec_filename = filename.replace(".wav", ".spec.pt")
+
+        # スペクトログラムファイルが存在するかチェック
         if os.path.exists(spec_filename):
             spec = torch.load(spec_filename)
-            # スペクトログラムの次元が2ではない場合は再計算
-            if spec.dim() != 2:
+            # スペクトログラムの次元が2でない、または他の検証が必要な場合は再計算
+            if spec.dim() != 2:  # 他の検証条件があればここに追加
                 spec = spectrogram_torch(audio_norm, self.filter_length,
                                          self.sampling_rate, self.hop_length, self.win_length,
                                          center=False)
                 torch.save(spec, spec_filename)
-
-        spec = spectrogram_torch(audio_norm, self.filter_length,
+        else:
+            # スペクトログラムファイルが存在しない場合は計算して保存
+            spec = spectrogram_torch(audio_norm, self.filter_length,
                                      self.sampling_rate, self.hop_length, self.win_length,
                                      center=False)
-        torch.save(spec, spec_filename)
+            torch.save(spec, spec_filename)
+
         return spec, audio_norm
 
     def get_text(self, text):
