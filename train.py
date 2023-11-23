@@ -61,7 +61,7 @@ def run(rank, n_gpus, hps):
     writer_eval = SummaryWriter(log_dir=os.path.join(hps.model_dir, "eval"))
 
   dist.init_process_group(
-      backend='gloo',  # 'nccl'
+      backend='nccl',  # 'nccl'
       init_method=f'tcp://localhost:8000',  # ポートを適切な値に変更
       world_size=n_gpus,
       rank=rank
@@ -80,12 +80,12 @@ def run(rank, n_gpus, hps):
       shuffle=True)
 
   collate_fn = TextAudioCollate()
-  train_loader = DataLoader(train_dataset, num_workers=2,shuffle=False, pin_memory=True,
+  train_loader = DataLoader(train_dataset, num_workers=4,shuffle=False, pin_memory=True,
       collate_fn=collate_fn, batch_sampler=train_sampler)
   '''num_workers=8,'''
   if rank == 0:
     eval_dataset = TextAudioLoader(hps.data.validation_files, hps.data)
-    eval_loader = DataLoader(eval_dataset, num_workers=2, shuffle=False,
+    eval_loader = DataLoader(eval_dataset, num_workers=4, shuffle=False,
         batch_size=hps.train.batch_size, pin_memory=True,
         drop_last=False, collate_fn=collate_fn)
 
