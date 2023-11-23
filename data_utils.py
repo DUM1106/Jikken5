@@ -37,7 +37,6 @@ class TextAudioLoader(torch.utils.data.Dataset):
         random.shuffle(self.audiopaths_and_text)
         self._filter()
 
-
     def _filter(self):
         """
         Filter text & store spec lengths
@@ -48,10 +47,16 @@ class TextAudioLoader(torch.utils.data.Dataset):
 
         audiopaths_and_text_new = []
         lengths = []
-        for audiopath, text in self.audiopaths_and_text:
-            if self.min_text_len <= len(text) and len(text) <= self.max_text_len:
-                audiopaths_and_text_new.append([audiopath, text])
-                lengths.append(os.path.getsize(audiopath) // (2 * self.hop_length))
+        for i, item in enumerate(self.audiopaths_and_text):
+            try:
+                audiopath, text = item
+                if self.min_text_len <= len(text) and len(text) <= self.max_text_len:
+                    audiopaths_and_text_new.append([audiopath, text])
+                    lengths.append(os.path.getsize(audiopath) // (2 * self.hop_length))
+            except ValueError:
+                print(f"Error unpacking item at index {i}: {item}")
+                # Optionally, break here or handle the error in a way that fits your use case
+                break  # or continue to process other items
         self.audiopaths_and_text = audiopaths_and_text_new
         self.lengths = lengths
 

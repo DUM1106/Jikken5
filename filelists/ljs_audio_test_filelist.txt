@@ -7391,7 +7391,6 @@ jvs_ver1/jvs074/parallel100/wav24kHz16bit/VOICEACTRESS100_090.wav|この男性�
 jvs_ver1/jvs074/parallel100/wav24kHz16bit/VOICEACTRESS100_091.wav|この男性は普通の高さで、普通の速さで話します。大人の雰囲気があり、太い声でかっこいい印象を与えます。流暢で明瞭な発音があります。
 jvs_ver1/jvs074/parallel100/wav24kHz16bit/VOICEACTRESS100_092.wav|この男性は普通の高さで、普通の速さで話します。大人の雰囲気があり、太い声でかっこいい印象を与えます。流暢で明瞭な発音があります。
 jvs_ver1/jvs074/parallel100/wav24kHz16bit/VOICEACTRESS100_093.wav|この男性は普通の高さで、普通の速さで話します。大人の雰囲気があり、太い声でかっこいい印象を与えます。流暢で明瞭な発音があります。
-jvs_ver1/jvs074/parallel100/wav24kHz16bit/VOICEACTRESS100_094.wav|この男性は普通の高さで、普通の速さで話します。大人の雰囲気があり、太い声でかっこいい印象を与えます。流暢で明瞭な発音があります。
 jvs_ver1/jvs074/parallel100/wav24kHz16bit/VOICEACTRESS100_095.wav|この男性は普通の高さで、普通の速さで話します。大人の雰囲気があり、太い声でかっこいい印象を与えます。流暢で明瞭な発音があります。
 jvs_ver1/jvs074/parallel100/wav24kHz16bit/VOICEACTRESS100_096.wav|この男性は普通の高さで、普通の速さで話します。大人の雰囲気があり、太い声でかっこいい印象を与えます。流暢で明瞭な発音があります。
 jvs_ver1/jvs074/parallel100/wav24kHz16bit/VOICEACTRESS100_097.wav|この男性は普通の高さで、普通の速さで話します。大人の雰囲気があり、太い声でかっこいい印象を与えます。流暢で明瞭な発音があります。

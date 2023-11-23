@@ -62,7 +62,7 @@ def run(rank, n_gpus, hps):
 
   dist.init_process_group(
       backend='gloo',  # 'nccl'
-      init_method=f'tcp://localhost:8000',  # ポートを適切な値に変更
+      init_method=f'tcp://localhost:8001',  # ポートを適切な値に変更
       world_size=n_gpus,
       rank=rank
   )
