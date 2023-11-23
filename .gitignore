@@ -1,0 +1,6 @@
+/jvs_ver1/
+poetry.lock
+pyproject.toml
+debug_log.txt
+/logs/
+/.venv/
