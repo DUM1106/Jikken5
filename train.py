@@ -62,7 +62,7 @@ def run(rank, n_gpus, hps):
 
   dist.init_process_group(
       backend='gloo',  # 'nccl'
-      init_method=f'tcp://localhost:8001',  # ポートを適切な値に変更
+      init_method=f'tcp://localhost:8000',  # ポートを適切な値に変更
       world_size=n_gpus,
       rank=rank
   )
@@ -147,11 +147,11 @@ def train_and_evaluate(rank, epoch, hps, nets, optims, schedulers, scaler, loade
   net_g.train()
   net_d.train()
 
-  for batch_idx, (x, x_lengths, spec, spec_lengths, y, y_lengths) in enumerate(train_loader):
+  for batch_idx, (x, x_lengths, spec, spec_lengths, y, y_lengths,spec2,spec_lengths2,y2,y2_lengths) in enumerate(train_loader):
     x, x_lengths = x, x_lengths.cuda(rank, non_blocking=True)
     spec, spec_lengths = spec.cuda(rank, non_blocking=True), spec_lengths.cuda(rank, non_blocking=True)
     y, y_lengths = y.cuda(rank, non_blocking=True), y_lengths.cuda(rank, non_blocking=True)
-
+    y2,y2_lengths=y2.cuda(rank,non_blocking=True),y2_lengths.cuda(rank,non_blocking=True)
     with autocast(enabled=hps.train.fp16_run):
       y_hat, ids_slice, y_mask, (z, m_q, logs_q) = net_g(x, spec, spec_lengths)
 
@@ -178,7 +178,7 @@ def train_and_evaluate(rank, epoch, hps, nets, optims, schedulers, scaler, loade
       y = commons.slice_segments(y, ids_slice * hps.data.hop_length, hps.train.segment_size) # slice 
 
       # Discriminator
-      y_d_hat_r, y_d_hat_g, _, _ = net_d(y, y_hat.detach())
+      y_d_hat_r, y_d_hat_g, _, _ = net_d(y2, y_hat.detach())
       with autocast(enabled=False):
         loss_disc, losses_disc_r, losses_disc_g = discriminator_loss(y_d_hat_r, y_d_hat_g)
         loss_disc_all = loss_disc

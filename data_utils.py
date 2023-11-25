@@ -49,10 +49,10 @@ class TextAudioLoader(torch.utils.data.Dataset):
         lengths = []
         for i, item in enumerate(self.audiopaths_and_text):
             try:
-                audiopath, text = item
+                audiopath1,audiopath2, text = item
                 if self.min_text_len <= len(text) and len(text) <= self.max_text_len:
-                    audiopaths_and_text_new.append([audiopath, text])
-                    lengths.append(os.path.getsize(audiopath) // (2 * self.hop_length))
+                    audiopaths_and_text_new.append([audiopath1,audiopath2, text])
+                    lengths.append(os.path.getsize(audiopath1) // (2 * self.hop_length))
             except ValueError:
                 print(f"Error unpacking item at index {i}: {item}")
                 # Optionally, break here or handle the error in a way that fits your use case
@@ -62,10 +62,11 @@ class TextAudioLoader(torch.utils.data.Dataset):
 
     def get_audio_text_pair(self, audiopath_and_text):
         # separate filename and text
-        audiopath, text = audiopath_and_text[0], audiopath_and_text[1]
+        audiopath1,audiopath2, text = audiopath_and_text[0], audiopath_and_text[1],audiopath_and_text[2]
         text = self.get_text(text)
-        spec, wav = self.get_audio(audiopath)
-        return (text, spec, wav)
+        spec1, wav1 = self.get_audio(audiopath1)
+        spec2,wav2=self.get_audio(audiopath2)
+        return (text, spec1, wav1,spec2,wav2)
 
     def get_audio(self, filename):
         audio, sampling_rate = load_wav_to_torch(filename)
@@ -78,9 +79,13 @@ class TextAudioLoader(torch.utils.data.Dataset):
 
         # スペクトログラムファイルが存在するかチェック
         if os.path.exists(spec_filename):
-            spec = torch.load(spec_filename)
+            try:
+                spec = torch.load(spec_filename)
+            except Exception as e:
+                print(f"Error loading spectrogram: {e}")
+                spec = None
             # スペクトログラムの次元が2でない、または他の検証が必要な場合は再計算
-            if spec.dim() != 2:  # 他の検証条件があればここに追加
+            if spec is None or spec.dim() != 2:  # 他の検証条件があればここに追加
                 spec = spectrogram_torch(audio_norm, self.filter_length,
                                          self.sampling_rate, self.hop_length, self.win_length,
                                          center=False)
@@ -122,11 +127,9 @@ class TextAudioCollate():
         """Collate's training batch from normalized text and aduio
         PARAMS
         ------
-        batch: [text_normalized, spec_normalized, wav_normalized]
+        batch: [text_normalized, spec_normalized, wav_normalized, spec_normalized2, wav_normalized2]
         """
         # Right zero-pad all one-hot text sequences to max input length
-        for i, data in enumerate(batch):
-            text, spec, wav = data
         _, ids_sorted_decreasing = torch.sort(
             torch.LongTensor([x[1].size(1) for x in batch]),
             dim=0, descending=True)
@@ -134,18 +137,27 @@ class TextAudioCollate():
         texts = [x[0] for x in batch]
         max_spec_len = max([x[1].size(1) for x in batch])
         max_wav_len = max([x[2].size(1) for x in batch])
+        max_spec_len2 = max([x[3].size(1) for x in batch])
+        max_wav_len2 = max([x[4].size(1) for x in batch])
 
         text_lengths = torch.LongTensor([len(x[0]) for x in batch])
         spec_lengths = torch.LongTensor([max_spec_len for _ in batch])
         wav_lengths = torch.LongTensor([max_wav_len for _ in batch])
+        spec_lengths2 = torch.LongTensor([max_spec_len2 for _ in batch])
+        wav_lengths2 = torch.LongTensor([max_wav_len2 for _ in batch])
 
         max_time_frames = max([x[1].size(0) for x in batch])  # 時間フレームの最大長を取得
         spec_padded = torch.FloatTensor(len(batch), max_time_frames, max_spec_len)
+        spec_padded2 = torch.FloatTensor(len(batch), max_time_frames, max_spec_len2)
 
         wav_padded = torch.FloatTensor(len(batch), 1, max_wav_len)
+        wav_padded2 = torch.FloatTensor(len(batch), 1, max_wav_len2)
 
         spec_padded.zero_()
         wav_padded.zero_()
+        spec_padded2.zero_()
+        wav_padded2.zero_()
+
         for i in range(len(ids_sorted_decreasing)):
             row = batch[ids_sorted_decreasing[i]]
 
@@ -155,14 +167,26 @@ class TextAudioCollate():
                 padding_needed = max_spec_len - spec.size(1)
                 # Pad the spec tensor. F.pad uses (padding_left, padding_right, padding_top, padding_bottom)
                 spec = F.pad(spec, (0, padding_needed), 'constant', 0)
-            # スペクトログラムを正しい次元でパディング
-            spec_padded[i, :spec.size(0), :] = spec  # spec.size(0) は時間フレームの長
+            spec_padded[i, :spec.size(0), :] = spec
+
+            spec2 = row[3]
+            if spec2.size(1) < max_spec_len2:
+                # Calculate how much padding is needed for the second spectrogram
+                padding_needed = max_spec_len2 - spec2.size(1)
+                # Pad the spec tensor for the second spectrogram
+                spec2 = F.pad(spec2, (0, padding_needed), 'constant', 0)
+            spec_padded2[i, :spec2.size(0), :] = spec2
+
             wav = row[2]
             wav_padded[i, :, :wav.size(1)] = wav
 
+            wav2 = row[4]
+            wav_padded2[i, :, :wav2.size(1)] = wav2
+
         if self.return_ids:
-            return texts, text_lengths, spec_padded, spec_lengths, wav_padded, wav_lengths, ids_sorted_decreasing
-        return texts, text_lengths, spec_padded, spec_lengths, wav_padded, wav_lengths
+            return texts, text_lengths, spec_padded, spec_lengths, wav_padded, wav_lengths, spec_padded2, spec_lengths2, wav_padded2, wav_lengths2, ids_sorted_decreasing
+        return texts, text_lengths, spec_padded, spec_lengths, wav_padded, wav_lengths, spec_padded2, spec_lengths2, wav_padded2, wav_lengths2
+
 
 
 """Multi speaker version"""
