@@ -185,7 +185,7 @@ class TextAudioCollate():
 
         if self.return_ids:
             return texts, text_lengths, spec_padded, spec_lengths, wav_padded, wav_lengths, spec_padded2, spec_lengths2, wav_padded2, wav_lengths2, ids_sorted_decreasing
-        return texts, text_lengths, spec_padded, spec_lengths, wav_padded, wav_lengths, spec_padded2, spec_lengths2, wav_padded2, wav_lengths2
+        return texts, text_lengths, spec_padded2, spec_lengths2, wav_padded2, wav_lengths2, spec_padded, spec_lengths, wav_padded, wav_lengths
 
 
 

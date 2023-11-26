@@ -24,7 +24,7 @@ def convert_mp3_to_wav(directory):
                 print(f"Converted '{mp3_path}' to '{wav_path}'")
 
 #Replace 'your_directory_path' with the path to the directory containing the MP3 files
-convert_mp3_to_wav('voicechanged/jvs097')
+convert_mp3_to_wav('voicechanged_val/jvs016')
 #jvs002 59
 #jvs004 70
 #jvs005 15 16 26 
