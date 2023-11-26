@@ -1,0 +1,8 @@
+jvs_ver1/jvs009/parallel100/wav24kHz16bit/VOICEACTRESS100_001.wav|voicechanged_val/jvs009/VOICEACTRESS100_001.wav|この男性の声は低いですし、遅い速さで話します。大人の雰囲気があり、渋い声で流暢で明瞭な発音を持っています。
+jvs_ver1/jvs010/parallel100/wav24kHz16bit/VOICEACTRESS100_002.wav|voicechanged_val/jvs010/VOICEACTRESS100_002.wav|この女性は高い声で、普通の速さで話します。若い雰囲気があり、細い明るい声で、可愛らしい印象を与えます。
+jvs_ver1/jvs011/parallel100/wav24kHz16bit/VOICEACTRESS100_003.wav|voicechanged_val/jvs011/VOICEACTRESS100_003.wav|この男性は高い声で、速い速さで話します。若い雰囲気があり、細い声で爽やかな明るさと流暢な発音が特徴です。
+jvs_ver1/jvs012/parallel100/wav24kHz16bit/VOICEACTRESS100_004.wav|voicechanged_val/jvs012/VOICEACTRESS100_004.wav|この男性は普通の高さで、速い速さで話します。若い雰囲気があり、明るくかっこいい声で流暢で爽やかな明瞭さがあります。
+jvs_ver1/jvs013/parallel100/wav24kHz16bit/VOICEACTRESS100_005.wav|voicechanged_val/jvs013/VOICEACTRESS100_005.wav|この男性の声は普通の高さで、普通の速さで話します。大人の雰囲気があり、流暢で爽やかで明瞭な発音を持っています。
+jvs_ver1/jvs014/parallel100/wav24kHz16bit/VOICEACTRESS100_006.wav|voicechanged_val/jvs014/VOICEACTRESS100_006.wav|この女性は高い声で、普通の速さで話します。若い雰囲気があり、流暢で明瞭な発音を持っています。
+jvs_ver1/jvs015/parallel100/wav24kHz16bit/VOICEACTRESS100_007.wav|voicechanged_val/jvs015/VOICEACTRESS100_007.wav|この女性は普通の高さで、速い速さで話します。若い雰囲気があり、可愛らしい声で流暢で爽やかな明瞭さがあります。
+jvs_ver1/jvs016/parallel100/wav24kHz16bit/VOICEACTRESS100_008.wav|voicechanged_val/jvs016/VOICEACTRESS100_008.wav|この女性は普通の高さで、普通の速さで話します。大人の雰囲気があり、太い声でかっこいい印象を与えます。流暢で爽やかで明瞭な発音があります。
